@@ -1,9 +1,5 @@
-# models/linear_regression.py
-
 import numpy as np
 import pandas as pd
-# from data_preprocess.breast_cancer import load_processed_data
-from data_preprocess.mushroom import load_processed_data
 
 class LinearRegression:
     def __init__(self):
@@ -47,37 +43,3 @@ class DatasetTrainer:
         mse = np.mean((self.model.predict(X_test) - y_test) ** 2)  # 计算均方误差
         accuracy = self.model.score(X_test, y_test)  # 计算准确率
         return mse, accuracy
-
-
-def main():
-    # 加载处理后的数据
-    trainer = DatasetTrainer(load_processed_data())
-    results = []
-
-    # 加载数据
-    data = trainer.load_dataset()
-    if data is None:
-        print("\n数据集为空")
-        return
-
-    # 训练和评估
-    X_train, X_test, y_train, y_test = data  # 假设数据是以元组形式返回的
-    mse, accuracy = trainer.train_and_evaluate(
-        X_train,
-        X_test,
-        y_train,
-        y_test,
-    )
-
-    # 保存结果
-    results.append({"mse": mse, "accuracy": accuracy})
-
-    # 打印所有结果的摘要
-    print("\n所有数据集的训练结果摘要:")
-    results_df = pd.DataFrame(results)
-    print(results)
-    print(results_df)
-
-
-if __name__ == "__main__":
-    main()

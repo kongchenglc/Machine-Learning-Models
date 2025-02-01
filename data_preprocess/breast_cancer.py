@@ -62,8 +62,7 @@ def preprocess_breast_cancer_data(data, target_column):
     X = (X - X.mean()) / X.std()
 
     # 划分训练集和测试集
-    # 设置随机种子
-    np.random.seed(42)
+    np.random.seed()
     # 创建一个随机排列的索引
     indices = np.random.permutation(len(X))
     # 80% 作为训练集，20% 作为测试集
