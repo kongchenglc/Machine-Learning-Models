@@ -5,10 +5,10 @@ import numpy as np
 
 def load_processed_data():
     """
-    加载乳腺癌数据集
-    返回: DataFrame - 包含特征和标签的数据集
+    Load breast cancer dataset
+    Returns: DataFrame - Dataset containing features and labels
     """
-    # 定义列名
+    # Define column names
     columns = [
         "id",
         "diagnosis",
@@ -44,28 +44,28 @@ def load_processed_data():
         "fractal_dimension_worst",
     ]
 
-    # 加载数据
+    # Load data
     data = pd.read_csv("./data/breastcancer/wdbc.data", header=None, names=columns)
     return preprocess_breast_cancer_data(data, "diagnosis")
 
 
 def preprocess_breast_cancer_data(data, target_column):
     """
-    预处理乳腺癌数据集
-    返回: (X_train, X_test, y_train, y_test) - 特征和标签的训练集和测试集
+    Preprocess breast cancer dataset
+    Returns: (X_train, X_test, y_train, y_test) - Training and testing sets of features and labels
     """
-    # 处理标签
-    y = (data[target_column] == "M").astype(int)  # 将'M'转换为1，'B'转换为0
-    X = data.drop(columns=[target_column, "id"])  # 删除标签和ID列
+    # Process labels
+    y = (data[target_column] == "M").astype(int)  # Convert 'M' to 1 and 'B' to 0
+    X = data.drop(columns=[target_column, "id"])  # Drop label and ID columns
 
-    # 标准化特征
+    # Standardize features
     X = (X - X.mean()) / X.std()
 
-    # 划分训练集和测试集
+    # Split into training and testing sets
     np.random.seed()
-    # 创建一个随机排列的索引
+    # Create a randomly permuted index
     indices = np.random.permutation(len(X))
-    # 80% 作为训练集，20% 作为测试集
+    # 80% for training set, 20% for testing set
     train_size = int(len(X) * 0.8)
     train_indices = indices[:train_size]
     test_indices = indices[train_size:]

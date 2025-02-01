@@ -6,10 +6,10 @@ import numpy as np
 
 def load_processed_data():
     """
-    加载蘑菇数据集
-    返回: DataFrame - 包含特征和标签的数据集
+    Load mushroom dataset
+    Returns: DataFrame - Dataset containing features and labels
     """
-    # 定义列名
+    # Define column names
     columns = [
         "class",
         "cap_shape",
@@ -36,7 +36,7 @@ def load_processed_data():
         "habitat",
     ]
 
-    # 加载数据
+    # Load data
     data = pd.read_csv(
         "./data/mushroom/agaricus-lepiota.data", header=None, names=columns
     )
@@ -45,29 +45,27 @@ def load_processed_data():
 
 def preprocess_mushroom_data(data, target_column):
     """
-    预处理蘑菇数据集
-    返回: (X_train, X_test, y_train, y_test) - 特征和标签的训练集和测试集
+    Preprocess mushroom dataset
+    Returns: (X_train, X_test, y_train, y_test) - Training and testing sets of features and labels
     """
-    # 将问号替换为 NaN
+    # Replace question marks with NaN
     data.replace("?", pd.NA, inplace=True)
 
-    # 删除包含 NaN 的行
+    # Drop rows containing NaN
     data.dropna(how='any', inplace=True)
 
-    # 处理标签
-    y = (data[target_column] == "p").astype(
-        int
-    )  # 将'poisonous'转换为1，'edible'转换为0
-    X = data.drop(columns=[target_column])  # 删除标签列
+    # Process labels
+    y = (data[target_column] == "p").astype(int)  # Convert 'poisonous' to 1 and 'edible' to 0
+    X = data.drop(columns=[target_column])  # Drop label column
 
-    # 将分类特征转换为虚拟变量
+    # Convert categorical features to dummy variables
     X = pd.get_dummies(X, drop_first=True)
 
-    # 划分训练集和测试集
+    # Split into training and testing sets
     np.random.seed()
-    # 创建一个随机排列的索引
+    # Create a randomly permuted index
     indices = np.random.permutation(len(X))
-    # 80% 作为训练集，20% 作为测试集
+    # 80% for training set, 20% for testing set
     train_size = int(len(X) * 0.8)
     train_indices = indices[:train_size]
     test_indices = indices[train_size:]
