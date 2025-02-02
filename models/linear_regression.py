@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 class LinearRegression:
     def __init__(self):
         self.coefficients = None
@@ -19,14 +20,6 @@ class LinearRegression:
         """Make predictions using the fitted model"""
         return np.dot(X, self.coefficients) + self.intercept
 
-    def score(self, X, y):
-        """Calculate accuracy"""
-        y_pred = self.predict(X)
-        # Assume threshold of 0.5 to convert predicted values to class results
-        y_pred_class = (y_pred >= 0.5).astype(int)
-        accuracy = np.mean(y_pred_class == y)  # Calculate accuracy
-        return accuracy
-
 
 class DatasetTrainer:
     def __init__(self, processed_data):
@@ -40,6 +33,7 @@ class DatasetTrainer:
     def train_and_evaluate(self, X_train, X_test, y_train, y_test):
         """Train and evaluate the model"""
         self.model.fit(X_train, y_train)  # Fit the model
-        mse = np.mean((self.model.predict(X_test) - y_test) ** 2)  # Calculate mean squared error
-        accuracy = self.model.score(X_test, y_test)  # Calculate accuracy
-        return mse, accuracy
+        mse = np.mean(
+            (self.model.predict(X_test) - y_test) ** 2
+        )  # Calculate mean squared error
+        return {"mse": mse}

@@ -2,39 +2,40 @@
 
 import pandas as pd
 from models.linear_regression import DatasetTrainer as linear_regression_trainer
+from models.logistic_regression import DatasetTrainer as logistic_regression_trainer
 
 from data_preprocess.mushroom import load_processed_data as mushroom_load_processed_data
 from data_preprocess.breast_cancer import load_processed_data as breast_cancer_load_processed_data
+from data_preprocess.estate_valuation import load_processed_data as estate_valuation_load_processed_data
+from data_preprocess.student_performance import load_processed_data as student_performance_load_processed_data
+
+
+# from data_preprocess.robot_failure import load_processed_data as robot_failure_load_processed_data
+
 
 def main():
-    # 配置模型和数据集
-    processed_data = mushroom_load_processed_data()  # 加载处理后的数据
-    trainer = linear_regression_trainer(processed_data)  # 传入处理好的数据
-    results = []
+    # Configure model and dataset
+    processed_data = student_performance_load_processed_data()  # Load processed data
+    trainer = linear_regression_trainer(processed_data)  # Pass the processed data
 
-    # 加载数据
+    # Load data
     data = trainer.load_dataset()
     if data is None:
-        print("\n数据集为空")
+        print("\nDataset is empty")
         return
 
-    # 训练和评估
-    X_train, X_test, y_train, y_test = data  # 假设数据是以元组形式返回的
-    mse, accuracy = trainer.train_and_evaluate(
+    # Train and evaluate
+    X_train, X_test, y_train, y_test = data  # Assume data is returned as a tuple
+    result = trainer.train_and_evaluate(
         X_train,
         X_test,
         y_train,
         y_test,
     )
 
-    # 保存结果
-    results.append({"mse": mse, "accuracy": accuracy})
-
-    # 打印所有结果的摘要
-    print("\n所有数据集的训练结果摘要:")
-    results_df = pd.DataFrame(results)
-    print(results)
-    print(results_df)
+    # Print results
+    print("Training results for the dataset:")
+    print(result)
 
 
 if __name__ == "__main__":
