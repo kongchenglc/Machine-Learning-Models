@@ -1,5 +1,3 @@
-# main.py
-
 import pandas as pd
 from models.linear_regression import DatasetTrainer as linear_regression_trainer
 from models.logistic_regression import DatasetTrainer as logistic_regression_trainer
@@ -8,14 +6,12 @@ from data_preprocess.mushroom import load_processed_data as mushroom_load_proces
 from data_preprocess.breast_cancer import load_processed_data as breast_cancer_load_processed_data
 from data_preprocess.estate_valuation import load_processed_data as estate_valuation_load_processed_data
 from data_preprocess.student_performance import load_processed_data as student_performance_load_processed_data
-
-
-# from data_preprocess.robot_failure import load_processed_data as robot_failure_load_processed_data
+from data_preprocess.robot_failure import load_processed_data as robot_failure_load_processed_data
 
 
 def main():
     # Configure model and dataset
-    processed_data = student_performance_load_processed_data()  # Load processed data
+    processed_data = robot_failure_load_processed_data()  # Load processed data
     trainer = linear_regression_trainer(processed_data)  # Pass the processed data
 
     # Load data

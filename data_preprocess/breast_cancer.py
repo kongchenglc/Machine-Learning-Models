@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+from utils.train_test_split import train_test_split
 
 def load_processed_data():
     """
@@ -61,16 +62,4 @@ def preprocess_breast_cancer_data(data, target_column):
     # Standardize features
     X = (X - X.mean()) / X.std()
 
-    # Split into training and testing sets
-    np.random.seed()
-    # Create a randomly permuted index
-    indices = np.random.permutation(len(X))
-    # 80% for training set, 20% for testing set
-    train_size = int(len(X) * 0.8)
-    train_indices = indices[:train_size]
-    test_indices = indices[train_size:]
-
-    X_train, X_test = X.iloc[train_indices], X.iloc[test_indices]
-    y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
-
-    return X_train, X_test, y_train, y_test
+    return train_test_split(X, y)
