@@ -7,24 +7,24 @@ class LabelEncoder:
         self.inverse_classes_dict_ = None
 
     def fit(self, y):
-        """拟合标签数据"""
-        # 获取标签的唯一值，并按字典顺序排序
+        """Fit label data"""
+        # Get unique values of labels and sort them in dictionary order
         self.classes_ = sorted(set(y))  
-        # 为每个标签分配一个唯一的整数
+        # Assign a unique integer to each label
         self.classes_dict_ = {label: idx for idx, label in enumerate(self.classes_)}
-        # 反向字典，便于之后将数字标签转回字符串
+        # Inverse dictionary for converting numeric labels back to strings
         self.inverse_classes_dict_ = {idx: label for label, idx in self.classes_dict_.items()}
 
     def transform(self, y):
-        """将标签数据转换为数字"""
+        """Transform label data to numbers"""
         return np.array([self.classes_dict_[label] for label in y])
 
     def fit_transform(self, y):
-        """拟合并转换标签"""
+        """Fit and transform labels"""
         self.fit(y)
         return self.transform(y)
 
     def inverse_transform(self, y):
-        """将数字标签转换回原始标签"""
+        """Convert numeric labels back to original labels"""
         return np.array([self.inverse_classes_dict_[label] for label in y])
 

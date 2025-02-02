@@ -5,7 +5,7 @@ from utils.train_test_split import train_test_split
 
 
 def add_time_features(df):
-    """为每个序列添加统计特征"""
+    """Add statistical features for each sequence"""
     df["mean"] = df["sequence"].apply(lambda x: x.mean())
     df["std"] = df["sequence"].apply(lambda x: x.std())
     df["max"] = df["sequence"].apply(lambda x: x.max(axis=0).mean())
@@ -15,9 +15,9 @@ def add_time_features(df):
 
 def parse_robot_file(file_path):
     """
-    解析包含标签块的机器人执行数据文件
-    :param file_path: 数据文件路径
-    :return: 包含标签和时序数据的DataFrame
+    Parse the robot execution data file containing label blocks
+    :param file_path: Path to the data file
+    :return: DataFrame containing labels and time series data
     """
     data = []
     current_label = None
@@ -26,9 +26,9 @@ def parse_robot_file(file_path):
     with open(file_path, "r") as f:
         for line in f:
             line = line.strip()
-            # 检测标签行（非数字开头）
+            # Detect label line (not starting with a number)
             if not line.split("\t")[0].lstrip("-").isdigit():
-                # 保存前一个标签的数据
+                # Save the previous label's data
                 if current_label is not None and len(current_sequence) == 15:
                     data.append(
                         {"label": current_label, "sequence": np.array(current_sequence)}
@@ -36,11 +36,11 @@ def parse_robot_file(file_path):
                 current_label = line.strip()
                 current_sequence = []
             elif line != "":
-                # 解析数据行
+                # Parse data line
                 values = [float(x) for x in line.split("\t")]
                 current_sequence.append(values)
 
-        # 添加最后一个标签的数据
+        # Add the last label's data
         if current_label is not None and len(current_sequence) == 15:
             data.append(
                 {"label": current_label, "sequence": np.array(current_sequence)}
@@ -50,11 +50,11 @@ def parse_robot_file(file_path):
 
 def load_processed_data(output_format="flatten"):
     """
-    完整数据处理流程
-    :param output_format: 'flatten' 或 'time_series'
-    :return: 特征数据和标签
+    Complete data processing workflow
+    :param output_format: 'flatten' or 'time_series'
+    :return: Feature data and labels
     """
-    # 读取并解析所有文件
+    # Read and parse all files
     all_data = []
     for i in range(1, 6):
         df = parse_robot_file(f"./data/robotfailure/lp{i}.data")
@@ -63,14 +63,14 @@ def load_processed_data(output_format="flatten"):
 
     full_df = pd.concat(all_data, ignore_index=True)
 
-    # 添加统计特征
+    # Add statistical features
     full_df = add_time_features(full_df)
 
-    # 标签编码
+    # Label encoding
     le = LabelEncoder()
     labels = le.fit_transform(full_df["label"])
 
-    # 根据需求返回不同格式
+    # Return different formats based on requirements
     if output_format == "flatten":
         X = np.array([seq.flatten() for seq in full_df["sequence"]])
 
