@@ -37,5 +37,8 @@ def load_processed_data():
     stds = X.std(axis=0)
     X_scaled = (X - means) / stds
 
+    # Convert y to Series (select first target column or squeeze if single-column)
+    y = y.iloc[:, 0]  # Select first target column as Series
+
     # Return the preprocessed data
     return train_test_split(X_scaled, y)

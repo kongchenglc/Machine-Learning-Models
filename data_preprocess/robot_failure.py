@@ -48,10 +48,9 @@ def parse_robot_file(file_path):
     return pd.DataFrame(data)
 
 
-def load_processed_data(output_format="flatten"):
+def load_processed_data():
     """
     Complete data processing workflow
-    :param output_format: 'flatten' or 'time_series'
     :return: Feature data and labels
     """
     # Read and parse all files
@@ -70,12 +69,5 @@ def load_processed_data(output_format="flatten"):
     le = LabelEncoder()
     labels = le.fit_transform(full_df["label"])
 
-    # Return different formats based on requirements
-    if output_format == "flatten":
-        X = np.array([seq.flatten() for seq in full_df["sequence"]])
-
-        return train_test_split(X, labels)
-    elif output_format == "time_series":
-        return np.array(full_df["sequence"]), labels
-    else:
-        raise ValueError("Supported formats: 'flatten' or 'time_series'")
+    X = np.array([seq.flatten() for seq in full_df["sequence"]])
+    return train_test_split(X, labels)
