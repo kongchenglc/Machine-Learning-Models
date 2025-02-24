@@ -50,9 +50,6 @@ class DatasetTrainer:
         # Determine regression task: float dtype or >25% unique values
         return y.dtype == float or len(np.unique(y)) > 0.25 * len(y)
 
-    def load_dataset(self):
-        return self.data
-
     def train_and_evaluate(self, X_train, X_test, y_train, y_test):
         # Convert all features to numerical values
         X_train = np.asarray(X_train, dtype=np.float64)

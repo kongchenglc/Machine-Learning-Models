@@ -26,54 +26,59 @@ class DecisionTree:
         """Predict class labels or regression values for given samples."""
         return np.array([self._traverse_tree(sample, self.tree) for sample in X])
 
+    def entropy(self, labels):
+        """Compute entropy for a set of labels."""
+        _, counts = np.unique(labels, return_counts=True)
+        probs = counts / counts.sum()
+        return -np.sum(probs * np.log2(probs + 1e-9))  # Adding 1e-9 to avoid log(0)
+
+    def information_gain(self, left_labels, right_labels, parent_entropy):
+        """Compute information gain based on the entropy."""
+        num_left = len(left_labels)
+        num_right = len(right_labels)
+        total = num_left + num_right
+
+        left_entropy = self.entropy(left_labels)
+        right_entropy = self.entropy(right_labels)
+
+        # Weighted average of the entropies
+        weighted_avg_entropy = (num_left / total) * left_entropy + (
+            num_right / total
+        ) * right_entropy
+
+        return parent_entropy - weighted_avg_entropy
+
     def _best_split(self, X, y):
-        """Find the best feature and threshold for splitting."""
+        """Find the best feature and threshold for splitting based on information gain."""
         num_samples, num_features = X.shape
         if num_samples <= 1:
             return None, None
 
-        best_score = float("inf")
+        best_score = -float("inf")
         best_feature, best_threshold = None, None
+
+        # Calculate parent entropy
+        parent_entropy = self.entropy(y)
 
         for feature in range(num_features):
             thresholds = np.unique(X[:, feature])
             for threshold in thresholds:
                 left_mask = X[:, feature] <= threshold
                 right_mask = X[:, feature] > threshold
+
+                # Skip if any side has no samples
                 if np.sum(left_mask) == 0 or np.sum(right_mask) == 0:
                     continue
 
-                score = self._impurity_score(y[left_mask], y[right_mask])
-                if score < best_score:
+                # Calculate information gain
+                score = self.information_gain(
+                    y[left_mask], y[right_mask], parent_entropy
+                )
+
+                if score > best_score:
                     best_score, best_feature, best_threshold = score, feature, threshold
 
         return best_feature, best_threshold
-
-    def _impurity_score(self, left_labels, right_labels):
-        """Compute impurity score (Gini for classification, MSE for regression)."""
-
-        def gini(labels):
-            _, counts = np.unique(labels, return_counts=True)
-            probs = counts / counts.sum()
-            return 1 - np.sum(probs**2)
-
-        def mse(values):
-            if len(values) == 0:
-                return 0
-            mean_value = np.mean(values)
-            return np.mean((values - mean_value) ** 2)
-
-        num_left, num_right = len(left_labels), len(right_labels)
-        total = num_left + num_right
-
-        if self.task == "classification":
-            return (num_left / total) * gini(left_labels) + (num_right / total) * gini(
-                right_labels
-            )
-        else:
-            return (num_left / total) * mse(left_labels) + (num_right / total) * mse(
-                right_labels
-            )
 
     def _build_tree(self, X, y, depth):
         """Recursively build the decision tree."""
@@ -120,20 +125,16 @@ class DatasetTrainer:
         self.model = DecisionTree()  # Use default parameters initially
         self.data = processed_data
 
-    def load_dataset(self):
-        """Return processed data"""
-        return self.data
-
     def train_and_evaluate(self, X_train, X_test, y_train, y_test):
-        """Train and evaluate the decision tree model"""
+        """Train and evaluate the decision tree model."""
         X_train = np.asarray(X_train, dtype=np.float64)
         X_test = np.asarray(X_test, dtype=np.float64)
         y_train = np.asarray(y_train)
         y_test = np.asarray(y_test)
-        
+
         self.model.fit(X_train, y_train)
         predictions = self.model.predict(X_test)
-        
+
         # Calculate appropriate metrics based on task type
         if self.model.task == "classification":
             accuracy = np.mean(predictions == y_test)

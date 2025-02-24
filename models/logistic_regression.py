@@ -8,33 +8,33 @@ class LogisticRegression:
         self.intercept = None
 
     def sigmoid(self, z):
-        """Sigmoid函数添加数值稳定性处理"""
-        z = np.clip(z, -500, 500)  # 防止指数爆炸
+        """Sigmoid function with numerical stability handling"""
+        z = np.clip(z, -500, 500)  # Prevent exponential overflow
         return 1 / (1 + np.exp(-z))
 
     def fit(self, X, y):
-        # 统一维度处理
+        # Dimension unification
         X = np.asarray(X)
         if X.ndim == 1:
             X = X.reshape(-1, 1)
         elif X.ndim > 2:
             X = X.reshape(X.shape[0], -1)
             
-        # 添加偏置项
+        # Add bias term
         X_b = np.c_[np.ones((X.shape[0], 1)), X]
         
-        # 参数初始化
+        # Initialize parameters
         self.coefficients = np.zeros(X_b.shape[1])
         
-        # 确保y为一维数组
+        # Ensure y is 1D array
         y = np.asarray(y).ravel()
         
-        # 优化梯度计算
+        # Optimized gradient calculation
         for iteration in range(1000):
             linear_model = X_b @ self.coefficients
             y_pred = self.sigmoid(linear_model)
             
-            # 统一维度计算
+            # Unified dimension calculation
             error = y_pred - y
             gradient = (X_b.T @ error) / len(y)
             
@@ -50,18 +50,14 @@ class LogisticRegression:
     def score(self, X, y):
         """Calculate accuracy"""
         y_pred = self.predict(X)
-        accuracy = np.mean(y_pred == y)  # Calculate accuracy
+        accuracy = np.mean(y_pred == y)
         return accuracy
 
 
 class DatasetTrainer:
     def __init__(self, processed_data):
-        self.model = LogisticRegression()  # Use custom logistic regression class
-        self.data = processed_data  # Directly pass in processed data
-
-    def load_dataset(self):
-        """Return processed data"""
-        return self.data
+        self.model = LogisticRegression()  # Use custom logistic regression
+        self.data = processed_data         # Directly use processed data
 
     def train_and_evaluate(self, X_train, X_test, y_train, y_test):
         """Train and evaluate the model"""
@@ -70,6 +66,6 @@ class DatasetTrainer:
         y_train = np.asarray(y_train)
         y_test = np.asarray(y_test)
         
-        self.model.fit(X_train, y_train)  # Fit the model
-        accuracy = self.model.score(X_test, y_test)  # Calculate accuracy
+        self.model.fit(X_train, y_train)    # Train model
+        accuracy = self.model.score(X_test, y_test)  # Get accuracy
         return {"accuracy": accuracy}

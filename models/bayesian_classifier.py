@@ -85,9 +85,6 @@ class DatasetTrainer:
         self.model = GaussianNaiveBayes()
         self.data = processed_data
 
-    def load_dataset(self):
-        return self.data
-
     def train_and_evaluate(self, X_train, X_test, y_train, y_test):
         # Convert one-hot encoded labels to class indices
         X_train = np.asarray(X_train, dtype=np.float64)
