@@ -29,21 +29,7 @@ Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
----
-
-## **Quick Start**
-### **Train a Linear Regression Model**
-```python
-from models.linear_regression import LinearRegressionModel
-
-# Load dataset
-X_train, X_test, y_train, y_test = load_preprocessed_data()
-
-# Initialize and train model
-model = LinearRegressionModel()
-model.fit(X_train, y_train)
-
-# Evaluate model
-print("Accuracy:", model.score(X_test, y_test))
+Train & Predict
+```bash
+python main.py 
 ```

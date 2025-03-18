@@ -1,44 +1,62 @@
 import pandas as pd
 import numpy as np
-from ucimlrepo import fetch_ucirepo
 from utils.train_test_split import train_test_split
+
+# Define student identity columns for merging
+MERGE_COLUMNS = [
+    "school",
+    "sex",
+    "age",
+    "address",
+    "famsize",
+    "Pstatus",
+    "Medu",
+    "Fedu",
+    "Mjob",
+    "Fjob",
+    "reason",
+    "nursery",
+    "internet",
+]
 
 
 def load_processed_data():
-    # Fetch dataset
-    student_performance = fetch_ucirepo(id=320)  # student performance dataset ID
+    # Load the datasets from CSV files
+    df_mat = pd.read_csv("./data/student_performance/student-mat.csv", sep=";")
+    df_por = pd.read_csv("./data/student_performance/student-por.csv", sep=";")
 
-    # Data (as pandas dataframes)
-    X = student_performance.data.features
-    y = student_performance.data.targets
+    # Merge datasets based on student identity columns
+    df = pd.merge(
+        df_mat, df_por, on=MERGE_COLUMNS, suffixes=("_mat", "_por"), how="outer"
+    )
 
-    # 1. Check for missing values (if any)
-    if X.isnull().any().any():
-        X = X.fillna(
-            X.mean()
-        )  # Replace missing values with the mean of the respective column
+    target_columns = ["G1_mat", "G2_mat", "G3_mat", "G1_por", "G2_por", "G3_por"]
+    feature_columns = [col for col in df.columns if col not in target_columns]
 
-    # 2. Ensure all columns are numeric (convert categorical columns to numeric)
+    X = df[feature_columns].copy()
+
     for column in X.select_dtypes(include=["object"]).columns:
-        X.loc[:, column] = pd.Categorical(
-            X[column]
-        ).codes  # Convert categorical to numeric codes
+        X[column] = X[column].astype("category").cat.codes
 
-    # 3. Ensure that the data is of numeric type (to avoid dtype issues)
-    X = X.apply(
-        pd.to_numeric, errors="coerce"
-    )  # Force conversion to numeric, non-numeric values will be NaN
+    y = df[target_columns]  # Targets
 
-    # 4. Fill any remaining NaN values (if any) after conversion
-    X = X.fillna(X.mean())  # Fill NaNs with column mean
+    # Convert categorical features to numeric codes
+    for column in X.select_dtypes(include=["object"]).columns:
+        X[column] = pd.Categorical(X[column]).codes  # Convert categories to numeric
 
-    # 5. Standardize the features (using mean and standard deviation)
+    # Ensure all columns are numeric
+    X = X.apply(pd.to_numeric, errors="coerce")  # Convert non-numeric values to NaN
+
+    # Handle missing values by filling with the mean
+    X = X.fillna(X.mean())
+
+    # Standardize features (zero mean, unit variance)
     means = X.mean(axis=0)
     stds = X.std(axis=0)
     X_scaled = (X - means) / stds
 
-    # Convert y to Series (select first target column or squeeze if single-column)
-    y = y.iloc[:, 0]  # Select first target column as Series
+    # You can use G1, G2, and G3 separately, or combine them
+    y = y.mean(axis=1)  # Average across all grades (optional)
 
-    # Return the preprocessed data
+    # Return the processed dataset
     return train_test_split(X_scaled, y)

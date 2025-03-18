@@ -31,9 +31,9 @@ DATASET_MAP = {
 def main():
     for model_name in MODEL_MAP.keys():
         for dataset_name in DATASET_MAP.keys():
-            print(f"\n{'='*40}")
+            print(f"\n{'-'*40}")
             print(f"Running {model_name} on {dataset_name}")
-            print(f"{'='*40}")
+            print(f"{'-'*40}")
             
             try:
                 dataset_loader = DATASET_MAP[dataset_name]
