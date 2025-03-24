@@ -12,6 +12,8 @@ from data_preprocess.estate_valuation import load_processed_data as estate_valua
 from data_preprocess.student_performance import load_processed_data as student_performance_load_processed_data
 from data_preprocess.robot_failure import load_processed_data as robot_failure_load_processed_data
 
+from utils.visualization import ModelVisualizer
+
 MODEL_MAP = {
     "linear_regression": linear_regression,
     "logistic_regression": logistic_regression,
@@ -29,7 +31,15 @@ DATASET_MAP = {
 }
 
 def main():
+    # Initialize visualizer
+    visualizer = ModelVisualizer()
+    
+    # Store results for comparison
+    all_results = {}
+    
     for model_name in MODEL_MAP.keys():
+        all_results[model_name] = {}
+        
         for dataset_name in DATASET_MAP.keys():
             print(f"\n{'-'*40}")
             print(f"Running {model_name} on {dataset_name}")
@@ -45,6 +55,9 @@ def main():
                 X_train, X_test, y_train, y_test = processed_data
                 result = trainer.train_and_evaluate(X_train, X_test, y_train, y_test)
                 
+                # Store results
+                all_results[model_name][dataset_name] = result
+                
                 print(f"Results for {model_name} on {dataset_name}:")
                 for metric, value in result.items():
                     print(f"{metric}: {value:.4f}")
@@ -52,6 +65,17 @@ def main():
             except Exception as e:
                 print(f"Error occurred: {str(e)}")
             print(f"{'-'*40}\n")
+    
+    # Generate the two main comparison plots
+    print("\nGenerating comprehensive comparisons...")
+    
+    # Compare accuracy results for classification tasks
+    print("\nComparing accuracy across all models and datasets...")
+    visualizer.plot_comprehensive_comparison(all_results, 'accuracy')
+    
+    # Compare RMSE results for regression tasks
+    print("\nComparing RMSE across all models and datasets...")
+    visualizer.plot_comprehensive_comparison(all_results, 'rmse')
 
 if __name__ == "__main__":
     main()
